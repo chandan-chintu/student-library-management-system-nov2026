@@ -5,6 +5,7 @@ import com.example.student_library_management_system.requestdto.StudentRequestDt
 import com.example.student_library_management_system.responsedto.StudentResponseDto;
 import com.example.student_library_management_system.service.StudentService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -56,11 +57,61 @@ service (business logic) -> repository (to perform various database operations)
         }
     }
 
+    @GetMapping("/findAllByPage")
+    public ResponseEntity<?> findAllStudentsByPage(@RequestParam int pageNo, @RequestParam int pageSize){
+        try {
+            Page<Student> studentPage = studentService.getStudentByPage(pageNo, pageSize);
+            return ResponseEntity.status(HttpStatus.OK).body(studentPage);
+        } catch (Exception e){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Exception occurred : "+e.getMessage()+"---"+e.getClass());
+        }
+    }
+
+    @GetMapping("/findAllByPageAndSort")
+    public ResponseEntity<?> findAllStudentsByPageAndSort(@RequestParam int pageNo, @RequestParam int pageSize, @RequestParam String sortByField, @RequestParam String orderBy){
+        try {
+            Page<Student> studentPage = studentService.getStudentByPageAndSort(pageNo, pageSize, sortByField, orderBy);
+            return ResponseEntity.status(HttpStatus.OK).body(studentPage);
+        } catch (Exception e){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Exception occurred : "+e.getMessage()+"---"+e.getClass());
+        }
+    }
+
     @DeleteMapping("/deleteById/{id}")
     public ResponseEntity<?> deleteStudentById(@PathVariable long id){
         try {
             String response = studentService.deleteStudentById(id);
             return ResponseEntity.status(HttpStatus.OK).body(response);
+        } catch (Exception e){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Exception occurred : "+e.getMessage()+"---"+e.getClass());
+        }
+    }
+
+    @PutMapping("/update/{id}")
+    public ResponseEntity<?> updateStudentUsingPut(@PathVariable int id, @RequestBody StudentRequestDto studentRequestDto){
+        try {
+            String response = studentService.updateStudentUsingPut(id, studentRequestDto);
+            return ResponseEntity.status(HttpStatus.OK).body(response);
+        } catch (Exception e){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Exception occurred : "+e.getMessage()+"---"+e.getClass());
+        }
+    }
+
+    @GetMapping("/findByEmail")
+    public ResponseEntity<?> findStudentByEmail(@RequestParam String email){
+        try {
+            Student student = studentService.getStudentByEmail(email);
+            return ResponseEntity.status(HttpStatus.OK).body(student);
+        } catch (Exception e){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Exception occurred : "+e.getMessage()+"---"+e.getClass());
+        }
+    }
+
+    @GetMapping("/findByDept")
+    public ResponseEntity<?> findStudentsByDept(@RequestParam String dept){
+        try {
+            List<Student> studentList = studentService.getStudentByDept(dept);
+            return ResponseEntity.status(HttpStatus.OK).body(studentList);
         } catch (Exception e){
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Exception occurred : "+e.getMessage()+"---"+e.getClass());
         }
